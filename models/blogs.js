@@ -3,13 +3,13 @@ const mongoose = require("mongoose");
 
 //set blogSchema
 const blogSchema = new mongoose.Schema({
-  title: String,
+  title: { type: String, required: true },
   author: String,
-  url: String,
+  url: { type: String, required: true },
   likes: Number,
 });
 
-//delete id and version data out of the return schema
+//delete id and version data out of the return response body
 blogSchema.set("toJSON", {
   transform: (document, returnedObject) => {
     delete returnedObject._id;
@@ -21,6 +21,10 @@ blogSchema.set("toJSON", {
 const Blog = mongoose.model("Blog", blogSchema);
 
 //connect to the MONGODB database
-mongoose.connect(config.MONGODB_URI);
+const MONGODB_URI =
+  process.env.NODE_ENV === "test"
+    ? process.env.TEST_MONGODB_URI
+    : process.env.MONGODB_URI;
+mongoose.connect(MONGODB_URI);
 
 module.exports = Blog;

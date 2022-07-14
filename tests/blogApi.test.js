@@ -121,6 +121,34 @@ describe("DELETE", () => {
   });
 });
 
+//PUT tests
+describe("PUT", () => {
+  //test if the valid id blog is updated
+  test("should successfully update the blog with the requested id", async () => {
+    //get the id of the first blog to be updated
+    let blogs = await Blog.find({});
+    const id = blogs[0]._id;
+
+    //create a new Blog for update
+    const newBlog = {
+      title: "NoLikes",
+      author: "Got No Likes",
+      url: "http://blog.cleancoder.com/uncle-bob/2017/03/03/got-no-likes",
+    };
+
+    //update and expect 201
+    await api
+      .put(`/api/blogs/${id}`)
+      .send(newBlog)
+      .expect(201)
+      .expect("Content-Type", /application\/json/);
+
+    //gets the blogs again and see if blog[0].title is NoLikes
+    blogs = await Blog.find({});
+    expect(blogs[0].title).toEqual("NoLikes");
+  });
+});
+
 //close mongoose connection after all the test
 afterAll(() => {
   mongoose.connection.close();

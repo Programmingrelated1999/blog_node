@@ -60,6 +60,7 @@ blogRouter.put("/:id", (request, response, next) => {
     likes: body.likes,
   };
 
+  //find by id and update, if update not successful then catch an error
   Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
     .then((updatedBlog) => {
       response.status(201).json(updatedBlog);

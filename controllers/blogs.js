@@ -44,6 +44,7 @@ blogRouter.delete("/:id", (request, response, next) => {
     .catch((error) => next(error));
 });
 
+//Router PUT the blog with same id
 blogRouter.put("/:id", (request, response, next) => {
   //set body to request body
   let body = request.body;

@@ -36,7 +36,11 @@ userRouter.post("/", async (request, response, next) => {
 
 //router GET all the users
 userRouter.get("/", async (request, response) => {
-  const userList = await User.find({});
+  const userList = await User.find({}).populate("blogs", {
+    title: 1,
+    url: 1,
+    _id: 0,
+  });
   response.status(200).json(userList);
 });
 

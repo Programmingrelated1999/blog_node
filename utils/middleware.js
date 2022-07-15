@@ -1,8 +1,11 @@
 const logger = require("./logger");
 
+//error handler
 const errorHandler = (error, request, response, next) => {
   logger.error(error.message);
 
+  //based on the type of error send an error
+  //mongoservererror is when the username is unique and cannot be send another time
   if (error.name === "CastError") {
     return response.status(400).send({ error: "malformatted id" });
   } else if (error.name === "ValidationError") {
@@ -15,6 +18,7 @@ const errorHandler = (error, request, response, next) => {
     });
   }
 
+  //if there is an error log the error
   logger.error(error.message);
   next(error);
 };

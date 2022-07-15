@@ -67,6 +67,7 @@ describe("total likes", () => {
     expect(result).toBe(5);
   });
 
+  //test when there are many blogs, the total likes is the sum of the blogs.likes
   test("when list has many blogs, equals the likes of total", () => {
     const result = listHelper.totalLikes(blogs);
     expect(result).toBe(

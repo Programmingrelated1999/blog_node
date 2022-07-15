@@ -7,6 +7,12 @@ const blogSchema = new mongoose.Schema({
   author: String,
   url: { type: String, required: true },
   likes: Number,
+  user: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
 });
 
 //delete id and version data out of the return response body

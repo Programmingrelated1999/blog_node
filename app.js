@@ -13,6 +13,8 @@ const loginRouter = require("./controllers/login");
 app.use(cors());
 app.use(express.json());
 
+app.use(middleware.tokenExtractor);
+
 //set basic router url for blogRouter
 app.use("/api/blogs", blogRouter);
 app.use("/api/users", userRouter);

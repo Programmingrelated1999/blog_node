@@ -4,15 +4,6 @@ const Blog = require("../models/blogs");
 const User = require("../models/users");
 const jwt = require("jsonwebtoken");
 
-//get token
-const getTokenFrom = (request) => {
-  const authorization = request.get("authorization");
-  if (authorization && authorization.toLowerCase().startsWith("bearer ")) {
-    return authorization.substring(7);
-  }
-  return null;
-};
-
 //Router GET all the blogs
 blogRouter.get("/", async (request, response) => {
   //use populate method to show user information rather than id
@@ -27,8 +18,7 @@ blogRouter.get("/", async (request, response) => {
 
 //Router POST all the blogs
 blogRouter.post("/", async (request, response, next) => {
-  const token = getTokenFrom(request);
-  const decodedToken = jwt.verify(token, process.env.SECRET);
+  const decodedToken = jwt.verify(request.token, process.env.SECRET);
   if (!decodedToken.id) {
     return response.status(401).json({ error: "token missing or invalid" });
   }
@@ -64,12 +54,32 @@ blogRouter.post("/", async (request, response, next) => {
 });
 
 //Router DELETE the blog with same id
-blogRouter.delete("/:id", (request, response, next) => {
-  Blog.findByIdAndRemove(request.params.id)
-    .then(() => {
+blogRouter.delete("/:id", async (request, response, next) => {
+  //verify if the token is correct then store it in decoded token,
+  //if not correct return error message
+  const decodedToken = jwt.verify(request.token, process.env.SECRET);
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: "token missing or invalid" });
+  }
+  //find user with the same id as a decoded token
+  const user = await User.findById(decodedToken.id);
+  //get blog which has the same id from url
+  const blogToDelete = await Blog.findById(request.params.id);
+
+  //if blog to delete user id and the token user id are the same then remove the blog
+  //else return error message
+  if (blogToDelete.user.toString() === user._id.toString()) {
+    try {
+      //save blog in savedBlog
+      await Blog.findByIdAndRemove(request.params.id);
+      //return response
       response.status(204).end();
-    })
-    .catch((error) => next(error));
+    } catch (error) {
+      next(error);
+    }
+  } else {
+    return response.status(401).json({ error: `Unauthorized` });
+  }
 });
 
 //Router PUT the blog with same id
